@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel de Sensibilidade</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#0f172a;
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.container{
+    background:#1e293b;
+    padding:25px;
+    border-radius:15px;
+    width:350px;
+    box-shadow:0 0 20px rgba(0,0,0,0.5);
+}
+
+h1{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+label{
+    display:block;
+    margin-top:10px;
+}
+
+select,input{
+    width:100%;
+    padding:10px;
+    border-radius:8px;
+    border:none;
+    margin-top:5px;
+}
+
+button{
+    width:100%;
+    margin-top:20px;
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    background:#22c55e;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.resultado{
+    margin-top:20px;
+    background:#0f172a;
+    padding:15px;
+    border-radius:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h1>Painel de Sensibilidade</h1>
+
+<label>Tipo de celular</label>
+<select id="celular">
+<option value="fraco">Celular Fraco</option>
+<option value="medio">Celular Médio</option>
+<option value="forte">Celular Forte</option>
+<option value="top">Top de Linha</option>
+</select>
+
+<label>DPI do celular</label>
+<input type="number" id="dpi" placeholder="Ex: 400">
+
+<button onclick="gerar()">Gerar Sensibilidade</button>
+
+<div class="resultado" id="resultado">
+Preencha e gere sua sensibilidade.
+</div>
+</div>
+
+<script>
+function gerar(){
+    let celular = document.getElementById("celular").value;
+    let dpi = parseInt(document.getElementById("dpi").value);
+
+    if(!dpi){
+        alert("Digite o DPI");
+        return;
+    }
+
+    let geral, redDot, x2, x4, awm;
+
+    if(celular === "fraco"){
+        geral = 80;
+        redDot = 75;
+        x2 = 65;
+        x4 = 55;
+        awm = 45;
+    }
+    else if(celular === "medio"){
+        geral = 90;
+        redDot = 85;
+        x2 = 75;
+        x4 = 65;
+        awm = 55;
+    }
+    else if(celular === "forte"){
+        geral = 100;
+        redDot = 95;
+        x2 = 85;
+        x4 = 75;
+        awm = 65;
+    }
+    else{
+        geral = 110;
+        redDot = 100;
+        x2 = 95;
+        x4 = 85;
+        awm = 75;
+    }
+
+    if(dpi >= 500){
+        geral += 5;
+        redDot += 5;
+    }
+
+    document.getElementById("resultado").innerHTML = `
+        <b>Sensibilidade Gerada</b><br><br>
+        Geral: ${geral}<br>
+        Red Dot: ${redDot}<br>
+        Mira 2x: ${x2}<br>
+        Mira 4x: ${x4}<br>
+        AWM: ${awm}
+    `;
+}
+</script>
+
+</body>
+  </html>
