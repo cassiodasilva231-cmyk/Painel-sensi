@@ -3,62 +3,74 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Painel de Sensibilidade</title>
+<title>Painel Pro Sensi</title>
 
 <style>
 body{
-    font-family: Arial, sans-serif;
-    background:#0f172a;
-    color:white;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
+font-family:Arial, sans-serif;
+background:linear-gradient(135deg,#020617,#0f172a);
+color:white;
+margin:0;
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
 }
 
 .container{
-    background:#1e293b;
-    padding:25px;
-    border-radius:15px;
-    width:350px;
-    box-shadow:0 0 20px rgba(0,0,0,0.5);
+width:430px;
+background:#111827;
+padding:25px;
+border-radius:18px;
+box-shadow:0 0 30px rgba(0,0,0,0.6);
 }
 
 h1{
-    text-align:center;
-    margin-bottom:20px;
+text-align:center;
+margin-bottom:15px;
 }
 
-label{
-    display:block;
-    margin-top:10px;
+.card{
+background:#020617;
+padding:12px;
+border-radius:10px;
+margin-top:10px;
 }
 
-select,input{
-    width:100%;
-    padding:10px;
-    border-radius:8px;
-    border:none;
-    margin-top:5px;
+input,select,button{
+width:100%;
+padding:10px;
+margin-top:8px;
+border:none;
+border-radius:8px;
 }
 
 button{
-    width:100%;
-    margin-top:20px;
-    padding:12px;
-    border:none;
-    border-radius:10px;
-    background:#22c55e;
-    color:white;
-    font-weight:bold;
-    cursor:pointer;
+background:#22c55e;
+color:white;
+font-weight:bold;
+cursor:pointer;
 }
 
-.resultado{
-    margin-top:20px;
-    background:#0f172a;
-    padding:15px;
-    border-radius:10px;
+.pix{
+background:#064e3b;
+padding:12px;
+border-radius:10px;
+margin-top:12px;
+}
+
+.free{
+background:#1f2937;
+padding:12px;
+border-radius:10px;
+margin-top:12px;
+}
+
+.lock{
+background:#3f1d1d;
+padding:12px;
+border-radius:10px;
+margin-top:12px;
 }
 </style>
 </head>
@@ -66,82 +78,119 @@ button{
 <body>
 
 <div class="container">
-<h1>Painel de Sensibilidade</h1>
 
-<label>Tipo de celular</label>
-<select id="celular">
-<option value="fraco">Celular Fraco</option>
-<option value="medio">Celular Médio</option>
-<option value="forte">Celular Forte</option>
-<option value="top">Top de Linha</option>
-</select>
+<h1>Painel Pro Sensibilidade</h1>
 
-<label>DPI do celular</label>
+<div class="card" id="device">
+Detectando celular...
+</div>
+
+<label>DPI</label>
 <input type="number" id="dpi" placeholder="Ex: 400">
+
+<label>Modo</label>
+<select id="modo">
+<option value="amostra">Amostra grátis</option>
+<option value="pro">Sensi PRO (pago)</option>
+</select>
 
 <button onclick="gerar()">Gerar Sensibilidade</button>
 
-<div class="resultado" id="resultado">
-Preencha e gere sua sensibilidade.
+<div class="card" id="resultado">
+Aguardando...
 </div>
+
+<div class="free">
+<b>Amostra grátis:</b><br>
+Geral: 120<br>
+Red Dot: 110<br>
+2x: 100<br>
+4x: 90
+</div>
+
+<div class="pix">
+<b>Comprar Sensi PRO</b><br>
+Valor: R$10<br><br>
+Pix (CPF):<br>
+<b>025.984.620-17</b><br><br>
+Depois do pagamento clique abaixo.
+<button onclick="liberar()">Já paguei no Pix</button>
+</div>
+
+<div class="lock" id="proLock">
+Conteúdo PRO bloqueado
+</div>
+
 </div>
 
 <script>
-function gerar(){
-    let celular = document.getElementById("celular").value;
-    let dpi = parseInt(document.getElementById("dpi").value);
 
-    if(!dpi){
-        alert("Digite o DPI");
-        return;
-    }
+let liberado = false;
 
-    let geral, redDot, x2, x4, awm;
+function detectarCelular(){
+let ua = navigator.userAgent;
+let modelo = "Não identificado";
 
-    if(celular === "fraco"){
-        geral = 80;
-        redDot = 75;
-        x2 = 65;
-        x4 = 55;
-        awm = 45;
-    }
-    else if(celular === "medio"){
-        geral = 90;
-        redDot = 85;
-        x2 = 75;
-        x4 = 65;
-        awm = 55;
-    }
-    else if(celular === "forte"){
-        geral = 100;
-        redDot = 95;
-        x2 = 85;
-        x4 = 75;
-        awm = 65;
-    }
-    else{
-        geral = 110;
-        redDot = 100;
-        x2 = 95;
-        x4 = 85;
-        awm = 75;
-    }
+if(ua.includes("SM-A025M")) modelo = "Samsung Galaxy A02";
+else if(ua.includes("SM")) modelo = "Samsung";
+else if(ua.includes("Moto")) modelo = "Motorola";
+else if(ua.includes("Redmi")) modelo = "Xiaomi Redmi";
+else if(ua.includes("Mi")) modelo = "Xiaomi Mi";
+else if(ua.includes("iPhone")) modelo = "iPhone";
 
-    if(dpi >= 500){
-        geral += 5;
-        redDot += 5;
-    }
-
-    document.getElementById("resultado").innerHTML = `
-        <b>Sensibilidade Gerada</b><br><br>
-        Geral: ${geral}<br>
-        Red Dot: ${redDot}<br>
-        Mira 2x: ${x2}<br>
-        Mira 4x: ${x4}<br>
-        AWM: ${awm}
-    `;
+document.getElementById("device").innerHTML =
+"<b>Celular detectado:</b> " + modelo +
+"<br>Resolução: " + screen.width + "x" + screen.height;
 }
+
+detectarCelular();
+
+function gerar(){
+
+let dpi = parseInt(document.getElementById("dpi").value);
+let modo = document.getElementById("modo").value;
+
+if(!dpi){
+alert("Digite o DPI");
+return;
+}
+
+if(modo === "pro" && !liberado){
+alert("Sensi PRO bloqueada. Faça o pagamento.");
+return;
+}
+
+let base = modo === "pro" ? 150 : 120;
+
+let geral = base + (dpi/20);
+let redDot = base - 5 + (dpi/25);
+let x2 = base - 15;
+let x4 = base - 25;
+let awm = base - 35;
+
+function limite(v){
+return Math.min(Math.round(v),200);
+}
+
+document.getElementById("resultado").innerHTML = `
+<b>Sensibilidade Gerada</b><br><br>
+Geral: ${limite(geral)}<br>
+Red Dot: ${limite(redDot)}<br>
+Mira 2x: ${limite(x2)}<br>
+Mira 4x: ${limite(x4)}<br>
+AWM: ${limite(awm)}<br><br>
+DPI: ${dpi}
+`;
+}
+
+function liberar(){
+liberado = true;
+document.getElementById("proLock").innerHTML =
+"Conteúdo PRO liberado ✅";
+alert("Sensi PRO liberada!");
+}
+
 </script>
 
 </body>
-  </html>
+</html>
