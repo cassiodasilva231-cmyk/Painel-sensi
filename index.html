@@ -3,232 +3,346 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>SensPro Elite</title>
 
+<meta name="theme-color" content="#020617">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SensPro Elite">
+
+<link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1055/1055687.png">
+<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1055/1055687.png">
+
 <style>
-body{
-font-family: Arial, sans-serif;
-background:#0f172a;
-color:white;
-margin:0;
-}
-
-header{
-background:#020617;
-padding:15px;
-text-align:center;
-font-size:22px;
-font-weight:bold;
-}
-
-.container{
-padding:20px;
-max-width:900px;
-margin:auto;
-}
-
-.card{
-background:#111827;
-padding:20px;
-border-radius:10px;
-margin-bottom:20px;
-}
-
-button{
-background:#22c55e;
-border:none;
-padding:10px 20px;
-border-radius:8px;
-color:white;
-cursor:pointer;
-}
-
-input{
-padding:10px;
-width:100%;
-margin-top:10px;
-margin-bottom:10px;
-border-radius:8px;
-border:none;
-}
-
-.admin{
-display:none;
-}
-
-.code{
-font-weight:bold;
-color:#22c55e;
-}
-
-.video{
-width:100%;
-border-radius:10px;
-}
-
-.rank{
-background:#020617;
-padding:10px;
-margin-top:10px;
-border-radius:8px;
-}
+body{margin:0;font-family:Arial;background:#020617;color:white;}
+header{text-align:center;padding:20px;font-size:24px;font-weight:bold;border-bottom:1px solid #1f2937;}
+.topBtn{text-align:center;margin-top:10px;}
+.container{max-width:950px;margin:auto;padding:20px;}
+.card{background:#0f172a;padding:20px;border-radius:14px;margin-bottom:18px;box-shadow:0 0 12px rgba(0,0,0,0.4);}
+button{background:#22c55e;border:none;padding:10px 18px;border-radius:8px;color:white;font-weight:bold;cursor:pointer;}
+button:hover{background:#16a34a;}
+input,select{width:100%;padding:10px;margin-top:8px;margin-bottom:10px;border-radius:8px;border:none;}
+.rank{background:#020617;padding:8px;margin-top:6px;border-radius:8px;}
+.admin{display:none;}
+.lock{background:#7f1d1d;padding:10px;border-radius:8px;}
+.ok{background:#14532d;padding:10px;border-radius:8px;}
+#loader{position:fixed;inset:0;background:black;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:9999;}
+.spinner{width:40px;height:40px;border:4px solid #1f2937;border-top:4px solid #22c55e;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:10px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+video{width:100%;border-radius:10px;}
 </style>
 </head>
 
 <body>
 
+<div id="loader">
+<div class="spinner"></div>
+<div>Verificando sistema...</div>
+</div>
+
 <header>SensPro Elite</header>
+
+<div class="topBtn">
+<button onclick="instalarApp()">Instalar App</button>
+<button onclick="abrirTutorial()">Tutorial</button>
+</div>
 
 <div class="container">
 
 <div class="card">
-<h2>Detecção do celular</h2>
-<p id="device"></p>
+<h2>Como usar</h2>
+1 Instale o app na tela inicial<br>
+2 Veja seu celular detectado<br>
+3 Coloque seu DPI<br>
+4 Escolha estilo<br>
+5 Gere sensibilidade<br>
+6 Se comprou acesso use o código
 </div>
 
 <div class="card">
-<h2>HUD recomendado</h2>
-<p id="hud"></p>
+<h2>Dispositivo detectado</h2>
+<div id="device"></div>
 </div>
 
 <div class="card">
-<h2>Dicas importantes</h2>
-<video class="video" controls>
-<source src="https://cdn.coverr.co/videos/coverr-gamer-playing-5172/1080p.mp4">
-</video>
+<h2>Desempenho do aparelho</h2>
+<div id="desempenho"></div>
 </div>
 
 <div class="card">
-<h2>Ativar acesso</h2>
-<p>Pagamento PIX:</p>
-<p><b>CPF:</b> 025.984.620-17</p>
+<h2>HUD recomendada</h2>
+<div id="hud"></div>
+</div>
+
+<div class="card">
+<h2>Gerador de Sensibilidade</h2>
+
+<label>DPI</label>
+<input id="dpi" type="number" placeholder="Ex: 400">
+
+<label>Estilo</label>
+<select id="estilo">
+<option>Rush</option>
+<option>Precisão</option>
+<option>Controlado</option>
+</select>
+
+<button onclick="gerar()">Gerar</button>
+
+<div id="sensi"></div>
+</div>
+
+<div class="card">
+<h2>Amostras grátis</h2>
+Geral 120<br>
+Red Dot 95<br>
+2x 85
+</div>
+
+<div class="card" id="lock">
+<h2>Conteúdo Premium</h2>
+PIX: 025.984.620-17
 
 <input id="codigo" placeholder="Digite o código">
-<button onclick="validarCodigo()">Ativar</button>
+<button onclick="ativar()">Liberar</button>
 
-<p id="status"></p>
+<div id="msg"></div>
+</div>
+
+<div class="card" id="premium" style="display:none;">
+<h2>Dicas Pro</h2>
+
+<video controls>
+<source src="https://cdn.coverr.co/videos/coverr-mobile-gaming-5171/1080p.mp4">
+</video>
+
+<p>
+Treine mira todos os dias<br>
+Use HUD adaptada<br>
+Ajuste sensibilidade aos poucos
+</p>
 </div>
 
 <div class="card">
-<h2>Ranking de usuários</h2>
+<h2>Ranking</h2>
 <div id="ranking"></div>
+<button onclick="rankingEntrar()">Entrar</button>
 </div>
 
 <div class="card">
-<h2>Login Admin</h2>
-<input id="adminUser" placeholder="Usuário">
-<input id="adminPass" type="password" placeholder="Senha">
-<button onclick="loginAdmin()">Entrar</button>
+<h2>Acesso Admin</h2>
+<input id="u" placeholder="Usuário">
+<input id="p" type="password" placeholder="Senha">
+<button onclick="login()">Entrar</button>
 </div>
 
-<div class="card admin" id="adminPanel">
+<div class="card admin" id="admin">
 <h2>Painel Admin</h2>
 
-<button onclick="gerarCodigo()">Gerar Código</button>
-<p>Código gerado: <span class="code" id="novoCodigo"></span></p>
+<button onclick="gerarCodigo()">Gerar código</button>
 
-<h3>Clientes ativados</h3>
+<p id="novo"></p>
+
+<h3>Códigos</h3>
+<div id="codigos"></div>
+
+<h3>Clientes</h3>
 <div id="clientes"></div>
+
 </div>
 
+</div>
+
+<div id="tutorialBox" style="position:fixed;inset:0;background:#020617;display:none;z-index:9999;padding:20px;">
+<h2>Tutorial</h2>
+Abra o site e instale como app.<br><br>
+Digite seu DPI.<br><br>
+Escolha estilo de jogo.<br><br>
+Gere sua sensibilidade ideal.<br><br>
+Se comprou acesso coloque o código.<br><br>
+<button onclick="fecharTutorial()">Fechar</button>
 </div>
 
 <script>
 
-// detectar celular
-let device = navigator.userAgent;
-document.getElementById("device").innerText = device;
+setTimeout(()=>{
+document.getElementById("loader").style.display="none";
+},1500);
 
-// HUD baseado em resolução
-function detectarHUD(){
-let w = screen.width;
+const deviceID =
+navigator.userAgent +
+screen.width +
+screen.height +
+navigator.hardwareConcurrency;
 
-if(w <= 720){
-return "HUD Compacta (Celular básico)";
-}
-if(w <= 1080){
-return "HUD Balanceada (Celular intermediário)";
-}
-return "HUD Avançada (Celular potente)";
-}
-
-document.getElementById("hud").innerText = detectarHUD();
-
-
-// banco simples
 let codigos = JSON.parse(localStorage.getItem("codigos")) || [];
 let clientes = JSON.parse(localStorage.getItem("clientes")) || [];
+let ranking = JSON.parse(localStorage.getItem("ranking")) || [];
 
-function salvar(){
-localStorage.setItem("codigos", JSON.stringify(codigos));
-localStorage.setItem("clientes", JSON.stringify(clientes));
+function detectar(){
+let ua=navigator.userAgent;
+let modelo="Desconhecido";
+
+if(ua.includes("SM-")) modelo="Samsung Galaxy";
+else if(ua.includes("iPhone")) modelo="iPhone";
+else if(ua.includes("Redmi")) modelo="Xiaomi Redmi";
+else if(ua.includes("Mi")) modelo="Xiaomi Mi";
+else if(ua.includes("Moto")) modelo="Motorola";
+else if(ua.includes("Realme")) modelo="Realme";
+
+document.getElementById("device").innerHTML=
+modelo+"<br>"+screen.width+"x"+screen.height+"<br>"+navigator.hardwareConcurrency+" núcleos";
+}
+detectar();
+
+function desempenho(){
+let cores=navigator.hardwareConcurrency||4;
+let nivel="Médio";
+if(cores>=8) nivel="Alto";
+if(cores<=4) nivel="Básico";
+document.getElementById("desempenho").innerText=nivel;
+}
+desempenho();
+
+function hud(){
+let w=screen.width;
+let tipo="HUD equilibrada";
+if(w<720) tipo="HUD compacta";
+if(w>1080) tipo="HUD avançada";
+document.getElementById("hud").innerText=tipo;
+}
+hud();
+
+function gerar(){
+let dpi=document.getElementById("dpi").value;
+let estilo=document.getElementById("estilo").value;
+if(!dpi) return;
+
+let g=Math.min(200,Math.round(dpi*0.3));
+let r=Math.min(200,Math.round(dpi*0.25));
+let x2=Math.min(200,Math.round(dpi*0.22));
+let x4=Math.min(200,Math.round(dpi*0.18));
+
+if(estilo==="Rush") g+=20;
+if(estilo==="Precisão") r+=15;
+
+document.getElementById("sensi").innerHTML=
+"<div class='ok'>Geral "+g+"<br>Red Dot "+r+"<br>2x "+x2+"<br>4x "+x4+"</div>";
 }
 
-
-// gerar código
 function gerarCodigo(){
-let code = "SP-" + Math.random().toString(36).substring(2,8).toUpperCase();
-codigos.push(code);
+let c="SENS-"+Math.random().toString(36).substring(2,8).toUpperCase();
+let novo={codigo:c,expira: Date.now()+86400000};
+codigos.push(novo);
 salvar();
-document.getElementById("novoCodigo").innerText = code;
+mostrar();
+document.getElementById("novo").innerText=c;
 }
 
-// validar código
-function validarCodigo(){
-let c = document.getElementById("codigo").value;
+function ativar(){
+let c=document.getElementById("codigo").value;
+let encontrado = codigos.find(x=>x.codigo===c);
 
-if(codigos.includes(c)){
+if(!encontrado){
+msg("Código inválido");
+return;
+}
+
+if(Date.now() > encontrado.expira){
+msg("Código expirado");
+return;
+}
+
+codigos = codigos.filter(x=>x.codigo!==c);
+
 clientes.push({
 codigo:c,
-device:device
+device:deviceID,
+data:new Date().toLocaleDateString()
 });
 
-codigos = codigos.filter(x=>x!==c);
+localStorage.setItem("ativo",deviceID);
+
 salvar();
+liberar();
+mostrar();
 
-document.getElementById("status").innerText = "Ativado com sucesso!";
-mostrarClientes();
-ranking();
-}else{
-document.getElementById("status").innerText = "Código inválido";
-}
+msg("Acesso liberado");
 }
 
+function msg(t){
+document.getElementById("msg").innerHTML="<div class='ok'>"+t+"</div>";
+}
 
-// login admin
-function loginAdmin(){
-let u = document.getElementById("adminUser").value;
-let p = document.getElementById("adminPass").value;
+function liberar(){
+document.getElementById("lock").style.display="none";
+document.getElementById("premium").style.display="block";
+}
 
+if(localStorage.getItem("ativo")===deviceID){
+liberar();
+}
+
+function login(){
+let u=document.getElementById("u").value;
+let p=document.getElementById("p").value;
 if(u==="admin" && p==="admin123"){
-document.getElementById("adminPanel").style.display="block";
-mostrarClientes();
-}else{
-alert("Login errado");
+document.getElementById("admin").style.display="block";
+mostrar();
 }
 }
 
-// mostrar clientes
-function mostrarClientes(){
-let div = document.getElementById("clientes");
-div.innerHTML="";
+function salvar(){
+localStorage.setItem("codigos",JSON.stringify(codigos));
+localStorage.setItem("clientes",JSON.stringify(clientes));
+localStorage.setItem("ranking",JSON.stringify(ranking));
+}
 
-clientes.forEach(c=>{
-div.innerHTML += "<p>"+c.codigo+" - "+c.device+"</p>";
+function mostrar(){
+let c=document.getElementById("codigos");
+let cli=document.getElementById("clientes");
+c.innerHTML="";
+cli.innerHTML="";
+codigos.forEach(x=>{
+c.innerHTML+="<div class='rank'>"+x.codigo+"</div>";
+});
+clientes.forEach(x=>{
+cli.innerHTML+="<div class='rank'>"+x.codigo+" | "+x.data+"</div>";
 });
 }
 
-// ranking
-function ranking(){
-let div = document.getElementById("ranking");
-div.innerHTML="";
+function rankingEntrar(){
+let nome=prompt("Nick");
+if(!nome) return;
+ranking.push(nome);
+salvar();
+mostrarRanking();
+}
 
-clientes.slice(0,10).forEach((c,i)=>{
-div.innerHTML += `<div class="rank">#${i+1} Jogador - ${c.device}</div>`;
+function mostrarRanking(){
+let div=document.getElementById("ranking");
+div.innerHTML="";
+ranking.slice(0,10).forEach((n,i)=>{
+div.innerHTML+="<div class='rank'>#"+(i+1)+" "+n+"</div>";
 });
 }
 
-ranking();
+mostrar();
+mostrarRanking();
+
+function instalarApp(){
+alert("Abra o menu do navegador e toque em Adicionar à tela inicial.");
+}
+
+function abrirTutorial(){
+document.getElementById("tutorialBox").style.display="block";
+}
+
+function fecharTutorial(){
+document.getElementById("tutorialBox").style.display="none";
+}
 
 </script>
 
