@@ -3,254 +3,234 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Painel Elite Sensibilidade</title>
+<title>SensPro Elite</title>
 
 <style>
 body{
-font-family:Arial, sans-serif;
-background:linear-gradient(135deg,#020617,#0f172a);
+font-family: Arial, sans-serif;
+background:#0f172a;
 color:white;
 margin:0;
-display:flex;
-justify-content:center;
-padding:20px;
+}
+
+header{
+background:#020617;
+padding:15px;
+text-align:center;
+font-size:22px;
+font-weight:bold;
 }
 
 .container{
-width:420px;
-background:#111827;
 padding:20px;
-border-radius:18px;
-box-shadow:0 0 30px rgba(0,0,0,0.6);
-}
-
-h1{
-text-align:center;
+max-width:900px;
+margin:auto;
 }
 
 .card{
-background:#020617;
-padding:12px;
+background:#111827;
+padding:20px;
 border-radius:10px;
-margin-top:10px;
-}
-
-input,select,button{
-width:100%;
-padding:10px;
-margin-top:8px;
-border:none;
-border-radius:8px;
+margin-bottom:20px;
 }
 
 button{
 background:#22c55e;
+border:none;
+padding:10px 20px;
+border-radius:8px;
 color:white;
-font-weight:bold;
 cursor:pointer;
 }
 
-.pix{
-background:#064e3b;
-padding:12px;
-border-radius:10px;
+input{
+padding:10px;
+width:100%;
 margin-top:10px;
+margin-bottom:10px;
+border-radius:8px;
+border:none;
 }
 
 .admin{
-background:#1f2937;
-padding:12px;
-border-radius:10px;
-margin-top:15px;
+display:none;
 }
 
-.lock{
-background:#3f1d1d;
+.code{
+font-weight:bold;
+color:#22c55e;
+}
+
+.video{
+width:100%;
+border-radius:10px;
+}
+
+.rank{
+background:#020617;
 padding:10px;
-border-radius:10px;
 margin-top:10px;
-}
-
-.dicas{
-background:#1e293b;
-padding:12px;
-border-radius:10px;
-margin-top:10px;
-font-size:14px;
+border-radius:8px;
 }
 </style>
 </head>
 
 <body>
 
+<header>SensPro Elite</header>
+
 <div class="container">
 
-<h1>Painel Elite Sensibilidade</h1>
-
-<div class="card" id="device">
-Detectando celular...
+<div class="card">
+<h2>Detecção do celular</h2>
+<p id="device"></p>
 </div>
 
-<label>DPI</label>
-<input type="number" id="dpi" placeholder="Ex: 400">
-
-<label>Modo</label>
-<select id="modo">
-<option value="free">Amostra grátis</option>
-<option value="pro">Sensi PRO</option>
-</select>
-
-<button onclick="gerar()">Gerar Sensibilidade</button>
-
-<div class="card" id="resultado">
-Aguardando...
+<div class="card">
+<h2>HUD recomendado</h2>
+<p id="hud"></p>
 </div>
 
-<div class="pix">
-<b>Comprar Sensi PRO</b><br>
-Valor: R$10<br>
-Pix: <b>025.984.620-17</b><br>
-
-<input type="text" id="codigo" placeholder="Digite o código recebido">
-<button onclick="validarCodigo()">Liberar PRO</button>
+<div class="card">
+<h2>Dicas importantes</h2>
+<video class="video" controls>
+<source src="https://cdn.coverr.co/videos/coverr-gamer-playing-5172/1080p.mp4">
+</video>
 </div>
 
-<div class="lock" id="statusPro">
-Conteúdo PRO bloqueado 🔒
+<div class="card">
+<h2>Ativar acesso</h2>
+<p>Pagamento PIX:</p>
+<p><b>CPF:</b> 025.984.620-17</p>
+
+<input id="codigo" placeholder="Digite o código">
+<button onclick="validarCodigo()">Ativar</button>
+
+<p id="status"></p>
 </div>
 
-<div class="dicas">
-<b>Dicas de jogo</b>
-<ul>
-<li>HUD com botão de tiro grande</li>
-<li>Treinar capa no modo treino</li>
-<li>DPI entre 400 e 800</li>
-<li>Sensibilidade alta ajuda no rush</li>
-</ul>
+<div class="card">
+<h2>Ranking de usuários</h2>
+<div id="ranking"></div>
 </div>
 
-<div class="dicas">
-<b>HUD recomendado</b>
-<ul>
-<li>Botão tiro: 70%</li>
-<li>Mira: 55%</li>
-<li>Pulo: grande</li>
-<li>HUD 3 dedos ou 4 dedos</li>
-</ul>
+<div class="card">
+<h2>Login Admin</h2>
+<input id="adminUser" placeholder="Usuário">
+<input id="adminPass" type="password" placeholder="Senha">
+<button onclick="loginAdmin()">Entrar</button>
 </div>
 
-<div class="admin">
-<b>Painel Admin</b>
+<div class="card admin" id="adminPanel">
+<h2>Painel Admin</h2>
 
-<input type="password" id="senhaAdmin" placeholder="Senha admin">
+<button onclick="gerarCodigo()">Gerar Código</button>
+<p>Código gerado: <span class="code" id="novoCodigo"></span></p>
 
-<button onclick="entrarAdmin()">Entrar</button>
-
-<div id="adminArea" style="display:none">
-
-<button onclick="gerarCodigo()">Gerar código</button>
-
-<div id="listaCodigos"></div>
-
-</div>
+<h3>Clientes ativados</h3>
+<div id="clientes"></div>
 </div>
 
 </div>
 
 <script>
 
-let liberado = false;
-let codigosValidos = ["TESTE123"];
+// detectar celular
+let device = navigator.userAgent;
+document.getElementById("device").innerText = device;
 
-function detectarCelular(){
-let ua = navigator.userAgent;
-let modelo = "Não identificado";
+// HUD baseado em resolução
+function detectarHUD(){
+let w = screen.width;
 
-if(ua.includes("SM-A025M")) modelo = "Samsung Galaxy A02";
-else if(ua.includes("SM-A")) modelo = "Samsung Galaxy";
-else if(ua.includes("Moto")) modelo = "Motorola";
-else if(ua.includes("Redmi")) modelo = "Xiaomi Redmi";
-else if(ua.includes("Mi")) modelo = "Xiaomi";
-else if(ua.includes("iPhone")) modelo = "iPhone";
-
-document.getElementById("device").innerHTML =
-"<b>Celular:</b> " + modelo +
-"<br>Resolução: " + screen.width + "x" + screen.height;
+if(w <= 720){
+return "HUD Compacta (Celular básico)";
+}
+if(w <= 1080){
+return "HUD Balanceada (Celular intermediário)";
+}
+return "HUD Avançada (Celular potente)";
 }
 
-detectarCelular();
+document.getElementById("hud").innerText = detectarHUD();
 
-function validarCodigo(){
-let codigo = document.getElementById("codigo").value;
 
-if(codigosValidos.includes(codigo)){
-liberado = true;
-document.getElementById("statusPro").innerHTML =
-"Sensi PRO liberada ✅";
-}else{
-alert("Código inválido");
-}
+// banco simples
+let codigos = JSON.parse(localStorage.getItem("codigos")) || [];
+let clientes = JSON.parse(localStorage.getItem("clientes")) || [];
+
+function salvar(){
+localStorage.setItem("codigos", JSON.stringify(codigos));
+localStorage.setItem("clientes", JSON.stringify(clientes));
 }
 
-function gerar(){
 
-let dpi = parseInt(document.getElementById("dpi").value);
-let modo = document.getElementById("modo").value;
-
-if(!dpi){
-alert("Digite o DPI");
-return;
-}
-
-if(modo === "pro" && !liberado){
-alert("Área PRO bloqueada");
-return;
-}
-
-let base = modo === "pro" ? 150 : 120;
-
-let geral = base + (dpi/20);
-let redDot = base - 5 + (dpi/25);
-let x2 = base - 15;
-let x4 = base - 25;
-let awm = base - 35;
-
-function limite(v){
-return Math.min(Math.round(v),200);
-}
-
-document.getElementById("resultado").innerHTML = `
-<b>Sensibilidade</b><br><br>
-Geral: ${limite(geral)}<br>
-Red Dot: ${limite(redDot)}<br>
-2x: ${limite(x2)}<br>
-4x: ${limite(x4)}<br>
-AWM: ${limite(awm)}
-`;
-}
-
-/* ADMIN */
-
-function entrarAdmin(){
-let senha = document.getElementById("senhaAdmin").value;
-
-if(senha === "admin123"){
-document.getElementById("adminArea").style.display="block";
-}else{
-alert("Senha errada");
-}
-}
-
+// gerar código
 function gerarCodigo(){
-let codigo = "SENSI" + Math.floor(Math.random()*100000);
-
-codigosValidos.push(codigo);
-
-document.getElementById("listaCodigos").innerHTML +=
-"<br>"+codigo;
+let code = "SP-" + Math.random().toString(36).substring(2,8).toUpperCase();
+codigos.push(code);
+salvar();
+document.getElementById("novoCodigo").innerText = code;
 }
+
+// validar código
+function validarCodigo(){
+let c = document.getElementById("codigo").value;
+
+if(codigos.includes(c)){
+clientes.push({
+codigo:c,
+device:device
+});
+
+codigos = codigos.filter(x=>x!==c);
+salvar();
+
+document.getElementById("status").innerText = "Ativado com sucesso!";
+mostrarClientes();
+ranking();
+}else{
+document.getElementById("status").innerText = "Código inválido";
+}
+}
+
+
+// login admin
+function loginAdmin(){
+let u = document.getElementById("adminUser").value;
+let p = document.getElementById("adminPass").value;
+
+if(u==="admin" && p==="admin123"){
+document.getElementById("adminPanel").style.display="block";
+mostrarClientes();
+}else{
+alert("Login errado");
+}
+}
+
+// mostrar clientes
+function mostrarClientes(){
+let div = document.getElementById("clientes");
+div.innerHTML="";
+
+clientes.forEach(c=>{
+div.innerHTML += "<p>"+c.codigo+" - "+c.device+"</p>";
+});
+}
+
+// ranking
+function ranking(){
+let div = document.getElementById("ranking");
+div.innerHTML="";
+
+clientes.slice(0,10).forEach((c,i)=>{
+div.innerHTML += `<div class="rank">#${i+1} Jogador - ${c.device}</div>`;
+});
+}
+
+ranking();
 
 </script>
 
 </body>
-               </html>
+  </html>
